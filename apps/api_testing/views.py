@@ -1128,6 +1128,7 @@ class TestExecutionViewSet(viewsets.ReadOnlyModelViewSet):
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
     <title>测试报告 - {execution.test_suite.name}</title>
 </head>
 <body>
