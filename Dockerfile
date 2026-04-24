@@ -5,16 +5,17 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# 系统依赖
+# 系统依赖（加 Java，Allure 报告生成需要）
 RUN apt-get update && apt-get install -y --no-install-recommends \
     default-libmysqlclient-dev build-essential pkg-config \
+    default-jre-headless \
     && rm -rf /var/lib/apt/lists/*
 
 # Python依赖
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 后端代码
+# 后端代码（含 allure/ 目录）
 COPY . .
 
 EXPOSE 8000
