@@ -252,6 +252,18 @@
               <span>{{ $t('menu.difyConfig') }}</span>
             </el-menu-item>
           </template>
+
+          <!-- 常用工具模块菜单 -->
+          <template v-else-if="currentModule === 'common-tools'">
+            <el-menu-item index="/common-tools/dashboard">
+              <el-icon><Odometer /></el-icon>
+              <span>首页</span>
+            </el-menu-item>
+            <el-menu-item index="/common-tools/list">
+              <el-icon><Suitcase /></el-icon>
+              <span>工具导航</span>
+            </el-menu-item>
+          </template>
         </el-menu>
       </el-aside>
 
@@ -324,7 +336,7 @@ import { useI18n } from 'vue-i18n'
 import {
   Monitor, Folder, Document, Flag, Check, Collection, VideoPlay,
   DataAnalysis, ChatDotRound, DocumentCopy, Link, MagicStick,
-  Odometer, Timer, Setting, AlarmClock, Bell, Aim, Edit, Cpu, ArrowDown, Cellphone, Connection, FolderOpened
+  Odometer, Timer, Setting, AlarmClock, Bell, Aim, Edit, Cpu, ArrowDown, Cellphone, Connection, FolderOpened, Suitcase
 } from '@element-plus/icons-vue'
 import logoSvg from '@/assets/images/logo.svg'
 import logoHomePng from '@/assets/images/logo_home.png'
@@ -358,6 +370,7 @@ const currentModule = computed(() => {
   if (route.path.startsWith('/app-automation')) return 'app-automation'
   if (route.path.startsWith('/ai-intelligent-mode')) return 'ai-intelligent-mode'
   if (route.path.startsWith('/configuration')) return 'configuration'
+  if (route.path.startsWith('/common-tools')) return 'common-tools'
   return ''
 })
 
@@ -368,7 +381,8 @@ const moduleName = computed(() => {
     'ui-automation': t('modules.uiAutomation'),
     'app-automation': 'APP自动化测试',
     'ai-intelligent-mode': t('modules.aiIntelligentMode'),
-    'configuration': t('modules.configuration')
+    'configuration': t('modules.configuration'),
+    'common-tools': '常用工具'
   }
   return map[currentModule.value] || ''
 })
@@ -439,7 +453,11 @@ const breadcrumbTitle = computed(() => {
     '/configuration/ai-mode': t('menu.aiModeConfig'),
     '/configuration/scheduled-task': t('menu.scheduledTaskConfig'),
     '/configuration/dify': t('menu.difyConfig'),
-    
+
+    // 常用工具
+    '/common-tools/dashboard': '首页',
+    '/common-tools/list': '工具导航',
+
     '/profile': t('nav.profile')
   }
   return routeMap[route.path] || route.meta.title || ''

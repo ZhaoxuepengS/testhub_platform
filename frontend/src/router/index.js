@@ -339,6 +339,32 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
+    path: '/common-tools',
+    component: Layout,
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: '',
+        redirect: 'dashboard'
+      },
+      {
+        path: 'dashboard',
+        name: 'CommonToolsDashboard',
+        component: () => import('@/views/common-tools/Dashboard.vue')
+      },
+      {
+        path: 'list',
+        name: 'CommonToolsList',
+        component: () => import('@/views/common-tools/ResourceList.vue')
+      },
+      {
+        path: 'detail/:id',
+        name: 'CommonToolsDetail',
+        component: () => import('@/views/common-tools/ResourceDetail.vue')
+      }
+    ]
+  },
+  {
     path: '/configuration',
     component: Layout,
     meta: { requiresAuth: true },

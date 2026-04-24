@@ -1473,7 +1473,7 @@ const saveCollectionName = async () => {
   }
 
   try {
-    await api.put(`/api-testing/collections/${editingNodeId.value}/`, {
+    await api.patch(`/api-testing/collections/${editingNodeId.value}/`, {
       name: editingNodeName.value.trim()
     })
     ElMessage.success('保存成功')
@@ -1988,7 +1988,7 @@ const updateCollection = async () => {
   }
 
   try {
-    await api.put(`/api-testing/collections/${editCollectionForm.id}/`, editCollectionForm)
+    await api.patch(`/api-testing/collections/${editCollectionForm.id}/`, editCollectionForm)
     ElMessage.success('更新成功')
     await loadCollections(selectedProject.value)
     showEditCollectionDialog.value = false

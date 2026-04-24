@@ -32,6 +32,7 @@ urlpatterns = [
     path('api/', include('apps.api_testing.urls')),
     path('api/core/', include('apps.core.urls')),
     path('api/data-factory/', include('apps.data_factory.urls')),
+    path('api/common-tools/', include('apps.common_tools.urls')),
 ]
 
 if settings.DEBUG:

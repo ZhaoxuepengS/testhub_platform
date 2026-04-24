@@ -106,6 +106,15 @@
           <h3>{{ $t('home.configCenter') }}</h3>
           <p>{{ $t('home.configCenterDesc') }}</p>
         </div>
+
+        <!-- 常用工具 -->
+        <div class="nav-card" @click="handleNavigate('common-tools')" role="button" tabindex="0">
+          <div class="card-icon common-tools-icon">
+            <el-icon><Suitcase /></el-icon>
+          </div>
+          <h3>常用工具</h3>
+          <p>测试团队统一资源中心，快速跳转常用工具与文档</p>
+        </div>
       </div>
     </div>
   </div>
@@ -118,7 +127,7 @@ import { useI18n } from 'vue-i18n'
 import { useUserStore } from '@/stores/user'
 import { useAppStore } from '@/stores/app'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { MagicStick, Link, Monitor, DataLine, Cpu, Setting, ChatDotRound, UserFilled, ArrowDown, Cellphone } from '@element-plus/icons-vue'
+import { MagicStick, Link, Monitor, DataLine, Cpu, Setting, ChatDotRound, UserFilled, ArrowDown, Cellphone, Suitcase } from '@element-plus/icons-vue'
 
 const router = useRouter()
 const { t } = useI18n()
@@ -160,6 +169,7 @@ const handleNavigate = (type) => {
     'ai-intelligent': '/ai-intelligent-mode/testing',
     'assistant': '/ai-generation/assistant',
     'config': '/configuration/ai-model',
+    'common-tools': '/common-tools/dashboard',
     'data': '/data-factory'
   }
 
@@ -354,6 +364,11 @@ const handleNavigate = (type) => {
   &.assistant-icon {
     background: #fff7e6;
     color: #fa8c16;
+  }
+
+  &.common-tools-icon {
+    background: #e6f7ff;
+    color: #1890ff;
   }
 }
 

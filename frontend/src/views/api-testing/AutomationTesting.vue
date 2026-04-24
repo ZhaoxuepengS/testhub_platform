@@ -328,7 +328,33 @@
 
         <div class="execution-results">
           <h4>{{ $t('apiTesting.automation.detailedResults') }}</h4>
-          <el-table :data="formatExecutionResults(currentExecution.results)">
+          <el-table :data="formatExecutionResults(currentExecution.results)" row-key="name" expand-row-keys>
+            <el-table-column type="expand">
+              <template #default="scope">
+                <div v-if="scope.row.assertions_results && scope.row.assertions_results.length" class="assertion-detail">
+                  <h5 style="margin: 8px 0; font-size: 13px;">断言详情</h5>
+                  <el-table :data="scope.row.assertions_results" size="small" border>
+                    <el-table-column prop="name" label="断言名称" min-width="150" />
+                    <el-table-column prop="type" label="类型" width="120" />
+                    <el-table-column label="期望值" width="120">
+                      <template #default="{ row }">{{ row.expected !== undefined && row.expected !== null ? row.expected : '-' }}</template>
+                    </el-table-column>
+                    <el-table-column label="实际值" width="150">
+                      <template #default="{ row }">{{ row.actual !== undefined && row.actual !== null ? row.actual : '-' }}</template>
+                    </el-table-column>
+                    <el-table-column label="结果" width="80">
+                      <template #default="{ row }">
+                        <el-tag :type="row.passed ? 'success' : 'danger'" size="small">
+                          {{ row.passed ? '通过' : '失败' }}
+                        </el-tag>
+                      </template>
+                    </el-table-column>
+                    <el-table-column prop="error" label="错误信息" min-width="200" show-overflow-tooltip />
+                  </el-table>
+                </div>
+                <div v-else style="padding: 8px; color: #909399; font-size: 13px;">无断言数据</div>
+              </template>
+            </el-table-column>
             <el-table-column prop="name" :label="$t('apiTesting.automation.requestName')" min-width="200" />
             <el-table-column prop="method" :label="$t('apiTesting.automation.method')" width="80">
               <template #default="scope">
@@ -883,6 +909,10 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.assertion-detail {
+  padding: 10px 20px;
+  background: #fafafa;
+}
 .automation-testing {
   padding: 20px;
   height: 100%;

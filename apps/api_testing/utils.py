@@ -189,29 +189,20 @@ def execute_test_suite(test_suite, environment, executed_by):
                 end_time = time.time()
                 response_time = (end_time - start_time) * 1000
                 
-                # 执行断言验证
-                assertions = api_request.assertions or []
+                # 执行断言验证（优先使用套件级别的断言，若为空则使用接口自身的断言）
+                assertions = suite_request.assertions or api_request.assertions or []
                 for assertion in assertions:
                     if assertion.get('type') == 'response_time':
                         assertion['actual_time'] = response_time
-                
+
                 assertions_results = execute_assertions(response, assertions)
-                
+
                 # 检查所有断言是否通过
                 passed = True
                 error_message = ''
-                
-                # 检查套件请求的断言
-                for assertion in suite_request.assertions:
-                    if assertion.get('type') == 'status_code':
-                        expected = assertion.get('value')
-                        if response.status_code != expected:
-                            passed = False
-                            error_message = f'状态码断言失败: 期望 {expected}, 实际 {response.status_code}'
-                            break
-                
-                # 检查接口自身的断言
-                if passed and assertions_results:
+
+                # 检查断言结果
+                if assertions_results:
                     for assertion_result in assertions_results:
                         if not assertion_result.get('passed', True):
                             passed = False
@@ -262,6 +253,7 @@ def execute_test_suite(test_suite, environment, executed_by):
                     'name': api_request.name,
                     'method': api_request.method,
                     'url': api_request.url,
+                    'status_code': None,
                     'passed': False,
                     'error': str(e)
                 })

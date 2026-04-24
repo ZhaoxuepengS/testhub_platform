@@ -765,32 +765,22 @@ class TestSuiteViewSet(viewsets.ModelViewSet):
                     end_time = time.time()
                     response_time = (end_time - start_time) * 1000
                     
-                    # 执行断言验证
-                    assertions = api_request.assertions or []
+                    # 执行断言验证（优先使用套件级别的断言，若为空则使用接口自身的断言）
+                    assertions = suite_request.assertions or api_request.assertions or []
                     # 添加响应时间到断言中
                     for assertion in assertions:
                         if assertion.get('type') == 'response_time':
                             assertion['actual_time'] = response_time
-                    
+
                     # 使用共享的断言执行方法
                     assertions_results = execute_assertions(response, assertions)
-                    
+
                     # 检查所有断言是否通过
                     passed = True
                     error_message = ''
-                    
-                    # 检查套件请求的断言
-                    for assertion in suite_request.assertions:
-                        # 简单的状态码断言
-                        if assertion.get('type') == 'status_code':
-                            expected = assertion.get('value')
-                            if response.status_code != expected:
-                                passed = False
-                                error_message = f'状态码断言失败: 期望 {expected}, 实际 {response.status_code}'
-                                break
-                    
-                    # 检查接口自身的断言
-                    if passed and assertions_results:
+
+                    # 检查断言结果
+                    if assertions_results:
                         for assertion_result in assertions_results:
                             if not assertion_result.get('passed', True):
                                 passed = False
@@ -841,6 +831,7 @@ class TestSuiteViewSet(viewsets.ModelViewSet):
                         'name': api_request.name,
                         'method': api_request.method,
                         'url': api_request.url,
+                        'status_code': None,
                         'passed': False,
                         'error': str(e)
                     })
@@ -918,7 +909,7 @@ class TestSuiteViewSet(viewsets.ModelViewSet):
                     defaults={
                         'order': TestSuiteRequest.objects.filter(test_suite=test_suite).count(),
                         'enabled': True,
-                        'assertions': []
+                        'assertions': list(api_request.assertions or [])
                     }
                 )
             
@@ -1465,6 +1456,50 @@ class TestExecutionViewSet(viewsets.ReadOnlyModelViewSet):
             logger.warning(f"Java 环境检查失败: {str(e)}")
             return False
     
+    def _generate_assertion_steps(self, assertions_results):
+        """根据断言结果生成Allure步骤"""
+        steps = []
+        if not assertions_results:
+            return steps
+
+        type_display = {
+            'status_code': '状态码断言',
+            'response_time': '响应时间断言',
+            'contains': '包含文本断言',
+            'json_path': 'JSON路径断言',
+            'header': '响应头断言',
+            'equals': '完全匹配断言',
+        }
+
+        for ar in assertions_results:
+            step = {
+                "name": ar.get('name') or type_display.get(ar.get('type', ''), '断言'),
+                "status": "passed" if ar.get('passed', False) else "failed",
+                "stage": "finished",
+                "start": int(time.time() * 1000),
+                "stop": int(time.time() * 1000),
+                "steps": []
+            }
+
+            # 构建断言详情
+            details = []
+            if ar.get('expected') is not None:
+                details.append(f"期望: {ar['expected']}")
+            if ar.get('actual') is not None:
+                details.append(f"实际: {ar['actual']}")
+            if ar.get('error'):
+                details.append(f"错误: {ar['error']}")
+
+            if details:
+                step["statusDetails"] = {
+                    "message": "; ".join(details),
+                    "trace": ""
+                }
+
+            steps.append(step)
+
+        return steps
+
     def _generate_test_result_files(self, execution, report_dir):
         """生成测试结果文件"""
         try:
@@ -1527,7 +1562,7 @@ class TestExecutionViewSet(viewsets.ReadOnlyModelViewSet):
                             "stage": "finished",
                             "start": int(time.time() * 1000) - 500,
                             "stop": int(time.time() * 1000),
-                            "steps": []
+                            "steps": self._generate_assertion_steps(result.get('assertions_results', []))
                         }
                     ]
                 }
