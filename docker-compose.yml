@@ -48,6 +48,7 @@ services:
       TIME_ZONE: ${TIME_ZONE:-Asia/Shanghai}
     volumes:
       - media_data:/app/media
+      - static_data:/app/static_files
     command: >
       bash -c "
         python manage.py migrate --noinput &&
@@ -111,8 +112,10 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
       - media_data:/usr/share/nginx/media:ro
+      - static_data:/usr/share/nginx/static:ro
 
 volumes:
   mysql_data:
   redis_data:
   media_data:
+  static_data:
